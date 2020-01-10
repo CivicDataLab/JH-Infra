@@ -5,7 +5,7 @@ This repository contains our Infrastructure automation setup and related documen
 
 For step by step processes on each, please check out our [wiki](https://github.com/CivicDataLab/JH-Infra/wiki)
 
-### System Requrirements
+### System Requirements
 < Add local system requirements and presetup details>
 
 ### Setting up local environment
