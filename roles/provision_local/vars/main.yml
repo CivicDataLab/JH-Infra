@@ -1,0 +1,10 @@
+# Variables associated with current role
+default_container_image: ubuntu:18.04
+default_container_command: sleep 1d
+default_docker_ssh_user: ansible
+default_docker_ssh_pass: 'docker.io'
+docker_groups:
+  - docker_containers
+inventory:
+  - name: ckan
+    image: ubuntu:18.04

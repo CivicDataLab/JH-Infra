@@ -1,0 +1,59 @@
+# tasks file can include smaller files if warranted
+
+- name: Bring up docker containers for inventory group of hosts
+
+  docker_container:
+    name: "{{ item.name }}"
+    image: "{{ item.image | default(default_container_image)}}"
+    privileged: true
+    state: started
+    tls: true
+    stop_timeout: 1
+    tty: true
+    exposed: "{{ item.expose|default(['1-65535']) }}"
+    ports: "{{ item.ports|default(omit) }}"
+    volumes: "{{ provision_docker_volumes|default(omit) }}"
+  with_items: "{{ inventory }}"
+
+- name: Get IP of container
+  local_action:
+    module: "command"
+    args: "docker inspect --format '{{ '{{' }} .NetworkSettings.IPAddress {{ '}}' }}' {{ item.name }}"
+  register: provision_docker_ip
+  with_items: "{{ inventory }}"
+  become: true
+  changed_when: false
+
+# - name: "Associate ip address with hosts"
+#   set_fact:
+#     ansible_ssh_host: "{{ provision_docker_ip.results[item.0].stdout }}"
+#     ansible_ssh_user: "{{ default_docker_ssh_user }}"
+#     ansible_ssh_pass: "{{ default_docker_ssh_pass }}"
+#   delegate_to: "{{ item.1.name }}"
+#   delegate_facts: True
+#   with_indexed_items: "{{ inventory }}"
+#   changed_when: false
+
+# - name: Wait for ssh
+#   wait_for:
+#     host: "{{ provision_docker_ip.results[item.0].stdout }}"
+#     port: 22
+#     timeout: 60
+#     connect_timeout: 5
+#   with_indexed_items: "{{ inventory }}"
+
+# - name: Make sure ssh is really up
+#   ping:
+#   delegate_to: "{{ item.name }}"
+#   with_items: "{{ inventory }}"
+
+- name: "Add docker hosts with connection docker"
+  add_host:
+    module: add_host
+    name: "{{ item.1.name }}"
+    docker_ip: "{{ provision_docker_ip.results[item.0].stdout }}"
+    ansible_connection: docker
+    ansible_user: root
+    groups: "{{ docker_groups | union(item.1.groups|default([])) | join(',') }}"
+  with_indexed_items: "{{ inventory }}"
+  changed_when: false
