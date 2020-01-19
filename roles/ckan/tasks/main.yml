@@ -1,0 +1,151 @@
+- name: create required directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0644
+  loop:
+    - "~/ckan/lib"
+    - "~/ckan/etc"
+    - "/et/ckan/default"
+
+- name: create symlinks
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  loop:
+    - { src: "~/ckan/lib", dest: "/usr/lib/ckan" }
+    - { src: "~/ckan/etc", dest: "/etc/ckan" }
+
+- name: create ckan env directory
+  file:
+    path: "{{ ckan_python_env_path }}"
+    state: directory
+
+- name: chown to current user
+  file:
+    path: "{{ ckan_python_env_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0755
+
+- name: Create virtual env for ckan
+  command: virtualenv --no-site-packages '{{ ckan_python_env_path }}' -p python2.7 creates="{{ ckan_python_env_path }}"
+
+- name: Install dependencies
+  pip:
+    name: setuptools 
+    version: '36.1'
+    virtualenv: '{{ ckan_python_env_path }}'
+
+- name: Install CKAN
+  pip:
+    virtualenv: '{{ ckan_python_env_path }}' 
+    name: git+https://github.com/ckan/ckan.git@ckan-2.8.2#egg=ckan 
+    state: present 
+
+- name: install ckan dependencies
+  pip:
+      virtualenv: '{{ ckan_python_env_path }}' 
+      requirements: '{{ ckan_python_env_path }}/src/ckan/requirements.txt' 
+      
+- name: Change owner for ckan directories
+  file:
+    path: "{{ item }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - "/etc/ckan/"
+    - "~/ckan/etc"
+
+- name: Compile ckan config
+  command:  paster make-config ckan /etc/ckan/default/development.ini
+
+
+# - name:  Install CKAN package
+#   command: 'dpkg --skip-same-version -i {{ ckan_package_dir }}/{{ ckan_package_filename }}'
+#   # http://stackoverflow.com/questions/19127493/in-ansible-how-do-you-prevent-a-dpkg-installation-task-to-notify-a-changed-stat
+#   register: ckan_installed
+#   changed_when: "'already installed' not in ckan_installed.stderr"
+#   notify:
+#     - Restart Apache
+#     - Restart Nginx
+
+# - name: Ensure CKAN storage folders exist and that Apache can write to them
+#   file: path={{ item }} owner=www-data mode=0755 state=directory
+#   with_items:
+#       - /var/lib/ckan/default/storage
+#       - /var/lib/ckan/default/storage/uploads
+
+# - name: Upgrade pip in the virtualenv that's included with CKAN
+#   pip:
+#     name: 'pip'
+#     version: '{{ pip_version }}'
+#     virtualenv: '{{ ckan_virtualenv_path }}'
+
+# - name: Install pip packages not covered by dependencies
+#   pip: name={{ item.name }} version={{ item.version }} virtualenv={{ ckan_virtualenv_path }}
+#   with_items: "{{ ckan_pip_dependencies }}"
+
+# # Jetty & Solr
+# - name: Set Jetty to start on boot
+#   lineinfile: 'dest=/etc/default/jetty regexp=^NO_START line="NO_START=0"'
+
+# - name: Set Jetty host to localhost
+#   lineinfile: 'dest=/etc/default/jetty regexp=^JETTY_HOST line="JETTY_HOST=127.0.0.1"'
+
+# - name: Set Jetty to port 8983
+#   lineinfile: 'dest=/etc/default/jetty regexp=^JETTY_PORT line="JETTY_PORT=8983"'
+
+# - name: Set Jetty to use system java
+#   lineinfile: 'dest=/etc/default/jetty regexp=JAVA_HOME line="JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/"'
+#   notify: Start Jetty
+
+# - name: Remove CKAN schema file
+#   file: path=/etc/solr/conf/schema.xml state=absent
+#   when: ckan_installed.changed
+
+# - name: Ensure CKAN uses provided schema file
+#   file: path=/etc/solr/conf/schema.xml src=/usr/lib/ckan/default/src/ckan/ckan/config/solr/schema.xml state=link force=yes
+#   notify: Restart Jetty
+
+# - name: Set CKAN Solr server address
+#   lineinfile: 'dest={{ ckan_config_path }} regexp=solr_url line=solr_url=http://127.0.0.1:8983/solr'
+
+# # Repoze.who
+# - name: Remove Repoze.who configuration file for CKAN
+#   file: path=/usr/lib/ckan/default/src/ckan/who.ini state=absent
+#   when: ckan_installed.changed
+
+# - name: Link Repoze.who configuration file for CKAN
+#   file: 'path=/usr/lib/ckan/default/src/ckan/who.ini src=/etc/ckan/default/who.ini state=link'
+
+# # FileStore
+# - name: Ensure FileStore directory exists
+#   file: path=/var/lib/ckan/default owner=www-data state=directory
+
+# - name: Set FileStore directory path
+#   lineinfile: 'dest={{ ckan_config_path }} regexp="ckan.storage_path" line="ckan.storage_path = /var/lib/ckan/default"'
+
+# - name: Ensure Apache can write to FileStore directory
+#   acl: name=/var/lib/ckan/default entity=www-data etype=user permissions=u+rwx
+#   notify: Restart Apache
+
+# # Simple plugins
+# - name: Install simple plugins into ckan virtualenv
+#   command: "{{ ckan_virtualenv_path }}/bin/pip install -e git+https://github.com/{{ item.repo }}.git@{{ item.version }}#egg={{ item.name }}"
+#   with_items: "{{ ckan_simple_plugins }}"
+
+# - name: Add simple plugins to CKAN plugin list
+#   lineinfile: dest="{{ ckan_config_path }}" regexp="^ckan.plugins(((?!{{ item.1 }}).)*)$" line="ckan.plugins\1 {{item.1 }}" backrefs=yes
+#   notify: Restart Apache
+#   with_subelements:
+#     - "{{ ckan_simple_plugins }}"
+#     - plugins
+
+# - name: Add simple viewer plugins to default viewer CKAN list
+#   lineinfile: dest="{{ ckan_config_path }}" regexp="^ckan.views.default_views(((?!{{ item.1 }}).)*)$" line="ckan.views.default_views\1 {{ item.1 }}" backrefs=yes
+#   notify: Restart Apache
+#   with_subelements:
+#     - "{{ ckan_simple_plugins }}"
+#     - default_views

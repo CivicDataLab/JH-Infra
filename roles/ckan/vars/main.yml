@@ -1,0 +1,3 @@
+# Variables associated with current role
+
+ckan_python_env_path: "/usr/lib/ckan/ckan-env"
