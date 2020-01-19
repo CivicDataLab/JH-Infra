@@ -9,3 +9,7 @@
 
   roles:
   - provision_local
+
+- hosts: ckan
+  roles:
+  - common
