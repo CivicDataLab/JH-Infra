@@ -6,7 +6,7 @@
   loop:
     - "~/ckan/lib"
     - "~/ckan/etc"
-    - "/et/ckan/default"
+    - "/etc/ckan/default"
 
 - name: create symlinks
   file:
