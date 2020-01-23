@@ -8,6 +8,8 @@ ckan_pip_dependencies:
   - { name: 'requests[security]', version: '2.10.0' }
 
 ckan_config_file: "/etc/ckan/default/development.ini"
+ckan_domain: localhost
+solr_domain: 127.0.0.1
 
 
 postgresql_user: postgres

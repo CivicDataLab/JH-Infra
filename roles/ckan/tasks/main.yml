@@ -96,8 +96,24 @@
 - name: Update CKAN site url the config
   lineinfile:
       path: "{{ ckan_config_file }}" 
-      regexp: "ckan.site_id" 
-      line: ckan.site_id = default
+      regexp: "ckan.site_url" 
+      line: "ckan.site_url = http://{{ ckan_domain }}:5000"
+
+- name: Update solr site url the config
+  lineinfile:
+      path: "{{ ckan_config_file }}" 
+      regexp: "solr_url" 
+      line: "solr_url = http://{{ solr_domain }}:5000"
+
+- name: Link who.ini configuration file for CKAN
+  file: 
+    dest: /etc/ckan/default/who.ini
+    src: "{{ ckan_python_env_path }}/src/ckan/who.ini"
+    state: link
+
+- name: Create database tables
+  command: "{{ ckan_python_env_path }}/bin/paster db init -c {{ ckan_config_file }}"
+
 
 
 # - name:  Install CKAN package
