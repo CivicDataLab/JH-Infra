@@ -66,9 +66,14 @@
     - "/etc/ckan/"
     - "~/ckan/etc"
 
-- name: Compile ckan config
-  command:  paster make-config ckan /etc/ckan/default/development.ini
+#TODO: need to find a workaround to keep the existing config if nothing changed
+- name: Remove existing config
+  file:
+    path: "/etc/ckan/default/development.ini"
+    state: absent
 
+- name: Compile ckan config
+  command: "{{ ckan_python_env_path }}/bin/paster make-config ckan /etc/ckan/default/development.ini"
 
 # - name:  Install CKAN package
 #   command: 'dpkg --skip-same-version -i {{ ckan_package_dir }}/{{ ckan_package_filename }}'
@@ -84,16 +89,6 @@
 #   with_items:
 #       - /var/lib/ckan/default/storage
 #       - /var/lib/ckan/default/storage/uploads
-
-# - name: Upgrade pip in the virtualenv that's included with CKAN
-#   pip:
-#     name: 'pip'
-#     version: '{{ pip_version }}'
-#     virtualenv: '{{ ckan_virtualenv_path }}'
-
-# - name: Install pip packages not covered by dependencies
-#   pip: name={{ item.name }} version={{ item.version }} virtualenv={{ ckan_virtualenv_path }}
-#   with_items: "{{ ckan_pip_dependencies }}"
 
 # # Jetty & Solr
 # - name: Set Jetty to start on boot
