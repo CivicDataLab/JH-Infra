@@ -32,11 +32,12 @@
 - name: Create virtual env for ckan
   command: virtualenv --no-site-packages '{{ ckan_python_env_path }}' -p python2.7 creates="{{ ckan_python_env_path }}"
 
-- name: Install dependencies
+- name: Install pip packages not covered by dependencies
   pip:
-    name: setuptools 
-    version: '36.1'
-    virtualenv: '{{ ckan_python_env_path }}'
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
+    virtualenv: "{{ ckan_python_env_path }}"
+  with_items: "{{ ckan_pip_dependencies }}"
 
 - name: Install CKAN
   pip:
