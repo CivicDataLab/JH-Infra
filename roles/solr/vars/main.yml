@@ -2,20 +2,20 @@ solr_download_url: http://apachemirror.wuchna.com/lucene/solr/8.3.1/solr-8.3.1.z
 
 solr_workspace: /root
 solr_version: "8.3.1"
-solr_filename: "solr-{{ solr_version }}" 
+solr_filename: "solr-{{ solr_version }}"
 solr_service_name: solr
 solr_install_path: "/opt/{{ solr_service_name }}"
-solr_user: solr 
+solr_user: solr
 solr_install_dir: /opt
 
 solr_home: "/var/{{ solr_service_name }}"
 solr_connect_host: localhost
 solr_port: "8983"
 
-
 solr_mirror: "https://archive.apache.org/dist"
 
-solr_config_file: /etc/default/{{ solr_service_name }}.in.sh
+solr_heap_config_file: /etc/default/{{ solr_service_name }}.in.sh
+ckan_solr_config_file: "{{ solr_home }}/data/ckan/conf/solrconfig.xml"
 
 solr_xms: "256M"
 solr_xmx: "512M"
@@ -24,13 +24,3 @@ solr_timezone: "UTC"
 
 solr_cores:
   - ckan
-
-
-
-
-# # Enable restart solr handler
-# solr_restart_handler_enabled: true
-
-# # Used only for Solr < 5.
-# solr_log_file_path: /var/log/solr.log
-# solr_host: "0.0.0.0"

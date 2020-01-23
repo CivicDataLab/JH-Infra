@@ -33,25 +33,24 @@
 - include: configure.yml
 - include: cores.yml
 
+- name: Apply CKAN schema factory configuration changes.
+  blockinfile:
+    dest: "{{ ckan_solr_config_file }}"
+    insertafter: "<config>"
+    block: '<schemaFactory class="ClassicIndexSchemaFactory"/>'
+    state: present
+  notify: restart solr
+
+- name: Remove update processer section
+  xml:
+      path: "{{ ckan_solr_config_file }}" 
+      xpath: /config/updateRequestProcessorChain/processor[@class='solr.AddSchemaFieldsUpdateProcessorFactory']
+      set_children: []
+      state: absent
+      pretty_print: yes
+
 # - include: cleanup.yml
 
 
 
 
-
-
-
-# - name: Apply Solr configuration changes.
-#   lineinfile:
-#     dest: "{{ solr_config_file }}"
-#     regexp: "{{ item.regexp }}"
-#     line: "{{ item.line }}"
-#     state: present
-#   with_items:
-#     - regexp: "^.?SOLR_JAVA_MEM="
-#       line: 'SOLR_JAVA_MEM="-Xms{{ solr_xms }} -Xmx{{ solr_xmx }}"'
-#     - regexp: "^SOLR_PORT="
-#       line: 'SOLR_PORT="{{ solr_port }}"'
-#     - regexp: "^.?SOLR_TIMEZONE="
-#       line: 'SOLR_TIMEZONE="{{ solr_timezone }}"'
-#   notify: restart solr
