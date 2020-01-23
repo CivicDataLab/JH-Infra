@@ -69,13 +69,37 @@
 #TODO: need to find a workaround to keep the existing config if nothing changed
 - name: Remove existing config
   file:
-    path: "/etc/ckan/default/development.ini"
+    path: "{{ ckan_config_file }}"
     state: absent
 
 - name: Compile ckan config
-  command: "{{ ckan_python_env_path }}/bin/paster make-config ckan /etc/ckan/default/development.ini"
+  command: "{{ ckan_python_env_path }}/bin/paster make-config ckan {{ ckan_config_file }}"
 
 - include: postgres.yml
+
+  # sqlalchemy.url = postgresql://<db_owner_name>:<owner_password>@localhost/<db_name>
+  # ckan.site_id = default
+  # ckan.site_url = http://<server_ip | domain_name>:5000
+
+- name: Update sqlalchemy url in the config
+  lineinfile:
+      path: "{{ ckan_config_file }}" 
+      regexp: "sqlalchemy.url" 
+      line: sqlalchemy.url = postgresql://{{ db_user }}:{{ db_password }}@localhost/{{ ckan_db_name }}
+
+- name: Update CKAN site id the config
+  lineinfile:
+      path: "{{ ckan_config_file }}" 
+      regexp: "ckan.site_id" 
+      line: ckan.site_id = default
+
+- name: Update CKAN site url the config
+  lineinfile:
+      path: "{{ ckan_config_file }}" 
+      regexp: "ckan.site_id" 
+      line: ckan.site_id = default
+
+
 # - name:  Install CKAN package
 #   command: 'dpkg --skip-same-version -i {{ ckan_package_dir }}/{{ ckan_package_filename }}'
 #   # http://stackoverflow.com/questions/19127493/in-ansible-how-do-you-prevent-a-dpkg-installation-task-to-notify-a-changed-stat
