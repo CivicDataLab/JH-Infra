@@ -112,9 +112,28 @@
     state: link
 
 - name: Create database tables
-  command: "{{ ckan_python_env_path }}/bin/paster db init -c {{ ckan_config_file }}"
+  command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan db init -c {{ ckan_config_file }}"
 
 
+# datastore plugin changes
+- name: Enable datastore plugin
+  lineinfile:
+      path: "{{ ckan_config_file }}" # required. The file to modify.,Before 2.3 this option was only usable as I(dest), I(destfile) and I(name).
+      backrefs: yes
+      regexp: "(ckan.plugins) (.*)" 
+      line: '\1 \2 datastore' 
+
+- name: Update datastore write url in the config
+  lineinfile:
+      path: "{{ ckan_config_file }}" 
+      regexp: "ckan.datastore.write_url" 
+      line: ckan.datastore.write_url = postgresql://{{ db_user }}:{{ db_password }}@localhost/{{ ckan_db_name }}
+
+- name: Update datastore read url in the config
+  lineinfile:
+      path: "{{ ckan_config_file }}" 
+      regexp: "ckan.datastore.read_url" 
+      line: ckan.datastore.read_url = postgresql://{{ datastore_user }}:{{ datastore_pass }}@localhost/{{ ckan_db_name }}
 
 # - name:  Install CKAN package
 #   command: 'dpkg --skip-same-version -i {{ ckan_package_dir }}/{{ ckan_package_filename }}'

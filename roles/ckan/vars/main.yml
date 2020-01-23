@@ -32,3 +32,8 @@ postgresql_hba_entries:
 
 postgresql_locales:
   - 'en_US.UTF-8'
+
+#Datastore
+datastore_db: ckan_datastore
+datastore_user: ckan_ds
+datastore_pass: ckan_ds_pass
