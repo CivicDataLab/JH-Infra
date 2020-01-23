@@ -24,7 +24,7 @@
 
 - include: install.yml
 
-- name: Ensure solr is started and enabled on boot 
+- name: Ensure solr is started and enabled on boot
   service:
     name: "{{ solr_service_name }}"
     state: "started"
@@ -43,14 +43,34 @@
 
 - name: Remove update processer section
   xml:
-      path: "{{ ckan_solr_config_file }}" 
-      xpath: /config/updateRequestProcessorChain/processor[@class='solr.AddSchemaFieldsUpdateProcessorFactory']
-      set_children: []
-      state: absent
-      pretty_print: yes
+    path: "{{ ckan_solr_config_file }}"
+    xpath: /config/updateRequestProcessorChain/processor[@class='solr.AddSchemaFieldsUpdateProcessorFactory']
+    set_children: []
+    state: absent
+    pretty_print: yes
+  notify: restart solr
 
-# - include: cleanup.yml
+- name: Remove init params processer section
+  xml:
+    path: "{{ ckan_solr_config_file }}"
+    xpath: /config/initparams[@path='/update/**']
+    set_children: []
+    state: absent
+    pretty_print: yes
+  notify: restart solr
 
+- name: Delete managed-schema file
+  file:
+    path: "{{ ckan_solr_conf_path }}/managed-schema"
+    state: absent
+  notify: restart solr
 
+- name: Create symlink to schema
+  file:
+    src: "{{ ckan_source_source }}"
+    dest: "{{ ckan_solr_conf_path }}/schema.xml"
+    state: link
+  notify: restart solr
 
+- include: cleanup.yml
 
