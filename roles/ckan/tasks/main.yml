@@ -53,9 +53,10 @@
 
 - name: install ckan dependencies
   pip:
-      virtualenv: '{{ ckan_python_env_path }}' 
-      requirements: '{{ ckan_python_env_path }}/src/ckan/requirements.txt' 
-      
+    virtualenv: "{{ ckan_python_env_path }}"
+    requirements: "{{ ckan_python_env_path }}/src/ckan/requirements.txt"
+
+
 - name: Change owner for ckan directories
   file:
     path: "{{ item }}"
