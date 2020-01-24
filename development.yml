@@ -13,3 +13,5 @@
 - hosts: ckan
   roles:
   - common
+  - ckan
+  # - solr
