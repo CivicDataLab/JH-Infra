@@ -10,7 +10,7 @@
     tls: true
     stop_timeout: 1
     tty: true
-    exposed: "{{ item.expose|default(['1-65535']) }}"
+    expose: "{{ item.expose|default(['1-65535']) }}"
     ports: "{{ item.ports|default(omit) }}"
     volumes: "{{ provision_docker_volumes|default(omit) }}"
   with_items: "{{ inventory }}"
