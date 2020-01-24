@@ -94,12 +94,11 @@
   
 - name: Create CKAN Database User
   postgresql_user:
-    name: "{{ db_user }}"
+    name: "{{ datastore_user }}"
     db: "{{ datastore_db }}"
-    password: "{{ db_password }}"
+    password: "{{ datastore_pass }}"
     state: present
   become: true
   become_user: "{{ postgresql_user }}"
   vars:
     ansible_ssh_pipelining: true
-
