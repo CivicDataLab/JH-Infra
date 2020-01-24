@@ -5,7 +5,6 @@ ckan_pip_dependencies:
   - { name: 'setuptools', version: '36.1.0'}
   - { name: 'wheel', version: '0.31.1'}
   - { name: 'urllib3[secure]', version: '1.19.1' }
-  - { name: 'requests[security]', version: '2.10.0' }
 
 ckan_config_file: "/etc/ckan/default/development.ini"
 ckan_domain: localhost
@@ -33,7 +32,15 @@ postgresql_hba_entries:
 postgresql_locales:
   - 'en_US.UTF-8'
 
+ckan_source_source: "{{ ckan_python_env_path }}/src/ckan/ckan/config/solr/schema.xml"
+ckan_solr_conf_path: "/var/solr/data/ckan/conf"
 #Datastore
 datastore_db: ckan_datastore
 datastore_user: ckan_ds
 datastore_pass: ckan_ds_pass
+
+#sysadmin
+ckan_admin: admin
+ckan_admin_email: info@civicdatalab.in
+ckan_admin_username: admin
+ckan_admin_password: Abcd1234
