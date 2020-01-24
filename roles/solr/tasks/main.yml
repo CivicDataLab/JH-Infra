@@ -65,12 +65,5 @@
     state: absent
   notify: restart solr
 
-- name: Create symlink to schema
-  file:
-    src: "{{ ckan_source_source }}"
-    dest: "{{ ckan_solr_conf_path }}/schema.xml"
-    state: link
-  notify: restart solr
-
 - include: cleanup.yml
 

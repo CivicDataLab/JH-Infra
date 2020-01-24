@@ -18,8 +18,6 @@ solr_heap_config_file: /etc/default/{{ solr_service_name }}.in.sh
 ckan_solr_conf_path: "{{ solr_home }}/data/ckan/conf"
 ckan_solr_config_file: "{{ ckan_solr_conf_path }}/solrconfig.xml"
 
-ckan_source_source: /usr/lib/ckan/ckan-env/src/ckan/ckan/config/solr/schema.xml
-
 solr_xms: "256M"
 solr_xmx: "512M"
 
