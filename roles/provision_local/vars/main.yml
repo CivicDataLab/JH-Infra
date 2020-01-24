@@ -8,3 +8,4 @@ docker_groups:
 inventory:
   - name: ckan
     image: yotis/ubuntu1804-pfne
+    expose: [ '5000', '8983']
