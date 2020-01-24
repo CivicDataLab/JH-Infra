@@ -6,7 +6,6 @@
   loop:
     - "~/ckan/lib"
     - "~/ckan/etc"
-    - "/etc/ckan/default"
 
 - name: create symlinks
   file:
@@ -56,6 +55,10 @@
     virtualenv: "{{ ckan_python_env_path }}"
     requirements: "{{ ckan_python_env_path }}/src/ckan/requirements.txt"
 
+- name: create config directory
+  file:
+    path: "/etc/ckan/default"
+    state: directory
 
 - name: Change owner for ckan directories
   file:
