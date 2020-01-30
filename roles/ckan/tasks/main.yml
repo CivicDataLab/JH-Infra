@@ -109,7 +109,7 @@
   lineinfile:
     path: "{{ ckan_config_file }}"
     regexp: "solr_url"
-    line: "solr_url = http://{{ solr_domain }}:5000"
+    line: "solr_url = http://{{ solr_domain }}:8983"
 
 - name: Link who.ini configuration file for CKAN
   file:
