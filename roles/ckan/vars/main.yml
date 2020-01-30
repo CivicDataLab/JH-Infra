@@ -1,6 +1,5 @@
 # Variables associated with current role
 
-ckan_python_env_path: "/usr/lib/ckan/ckan-env"
 ckan_pip_dependencies:
   - { name: 'setuptools', version: '36.1.0'}
   - { name: 'wheel', version: '0.31.1'}
@@ -32,7 +31,7 @@ postgresql_hba_entries:
 postgresql_locales:
   - 'en_US.UTF-8'
 
-ckan_source_source: "{{ ckan_python_env_path }}/src/ckan/ckan/config/solr/schema.xml"
+ckan_solr_schema_source: "{{ ckan_python_env_path }}/src/ckan/ckan/config/solr/schema.xml"
 ckan_solr_conf_path: "/var/solr/data/ckan/conf"
 #Datastore
 datastore_db: ckan_datastore
