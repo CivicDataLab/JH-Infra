@@ -78,6 +78,11 @@
 - name: Compile ckan config
   command: "{{ ckan_python_env_path }}/bin/paster make-config ckan {{ ckan_config_file }}"
 
+- include_role:
+    name: solr 
+    tasks_from: main 
+    vars_from: main 
+
 - include: postgres.yml
   # sqlalchemy.url = postgresql://<db_owner_name>:<owner_password>@localhost/<db_name>
   # ckan.site_id = default
@@ -115,10 +120,6 @@
 - name: Create database tables
   command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan db init -c {{ ckan_config_file }}"
 
-- include_role:
-    name: solr 
-    tasks_from: main 
-    vars_from: main 
 
 - name: Create symlink to schema
   file:
