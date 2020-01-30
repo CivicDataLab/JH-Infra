@@ -44,6 +44,7 @@
     - libssl-dev
     - libpq5
     - libpq-dev
+    - lsof
     - nginx
     - python-pip
     - python3-pip
