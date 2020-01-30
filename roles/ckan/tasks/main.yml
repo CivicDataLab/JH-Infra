@@ -84,9 +84,7 @@
     vars_from: main 
 
 - include: postgres.yml
-  # sqlalchemy.url = postgresql://<db_owner_name>:<owner_password>@localhost/<db_name>
-  # ckan.site_id = default
-  # ckan.site_url = http://<server_ip | domain_name>:5000
+
 - name: Update sqlalchemy url in the config
   lineinfile:
     path: "{{ ckan_config_file }}"
@@ -131,7 +129,7 @@
 # datastore plugin changes
 - name: Enable datastore plugin
   lineinfile:
-    path: "{{ ckan_config_file }}" # required. The file to modify.,Before 2.3 this option was only usable as I(dest), I(destfile) and I(name).
+    path: "{{ ckan_config_file }}"
     backrefs: yes
     regexp: "(ckan.plugins) (.*)"
     line: '\1 \2 datastore'
@@ -151,6 +149,8 @@
 - name: set db permissions
   command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan datastore set-permissions -c {{ ckan_config_file }}"
   become: true
+
+# end datastore plugin conf
 
 - name: Check if CKAN admin user exists
   become: yes
