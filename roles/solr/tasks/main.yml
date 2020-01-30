@@ -72,6 +72,35 @@
     pretty_print: yes
   notify: restart solr
 
+- name: Remove default search field config
+  lineinfile:
+    path: "{{ ckan_solr_schema_source }}"
+    regexp: "defaultSearchField"
+    state: absent
+  notify: restart solr
+
+- name: Remove solrQueryParser config
+  lineinfile:
+    path: "{{ ckan_solr_schema_source }}"
+    regexp: "solrQueryParser"
+    state: absent
+  notify: restart solr
+
+- name: replace old datatypes with new ones
+  replace:
+    path: "{{ ckan_solr_schema_source }}"
+    regexp: "{{ item.old }}"
+    replace: "{{ item.new }}"
+  loop:
+  - {old: "textgen", new: "text_general"}
+  - {old: "tdate", new: "pdate"}
+  - {old: "tdates", new: "pdates"}
+  - {old: "tlong", new: "plong"}
+  - {old: "tlongs", new: "tlongs"}
+  - {old: "tdouble", new: "pdouble"}
+  - {old: "tdoubles", new: "pdoubles"}
+
+
 - name: Delete managed-schema file
   file:
     path: "{{ ckan_solr_conf_path }}/managed-schema"
