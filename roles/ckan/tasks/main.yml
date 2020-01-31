@@ -103,11 +103,11 @@
     regexp: "ckan.site_url"
     line: "ckan.site_url = http://{{ ckan_domain }}:5000"
 
-- name: Update solr site url the config
+- name: Update solr url in the config
   lineinfile:
     path: "{{ ckan_config_file }}"
     regexp: "solr_url"
-    line: "solr_url = http://{{ solr_domain }}:8983"
+    line: "solr_url = http://{{ solr_domain }}:8983/solr/ckan"
 
 - name: Link who.ini configuration file for CKAN
   file:
