@@ -1,3 +1,6 @@
 *.retry
 */__pycache__
 *.pyc
+
+ansible.log
+tags
