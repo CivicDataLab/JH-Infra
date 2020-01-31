@@ -1,1 +1,2 @@
 ckan_python_env_path: "/usr/lib/ckan/ckan-env"
+ckan_solr_schema_source: "{{ ckan_python_env_path }}/src/ckan/ckan/config/solr/schema.xml"

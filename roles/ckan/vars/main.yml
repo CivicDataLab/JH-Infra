@@ -31,7 +31,6 @@ postgresql_hba_entries:
 postgresql_locales:
   - 'en_US.UTF-8'
 
-ckan_solr_schema_source: "{{ ckan_python_env_path }}/src/ckan/ckan/config/solr/schema.xml"
 ckan_solr_conf_path: "/var/solr/data/ckan/conf"
 #Datastore
 datastore_db: ckan_datastore
