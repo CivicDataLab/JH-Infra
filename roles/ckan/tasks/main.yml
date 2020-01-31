@@ -116,18 +116,18 @@
     src: "{{ ckan_python_env_path }}/src/ckan/who.ini"
     state: link
 
-- name: Create database tables
-  command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan db init -c {{ ckan_config_file }}"
-
-
 - name: Copy solr schema
   copy:
     src: "{{ ckan_solr_schema_source }}"
     dest: "{{ ckan_solr_conf_path }}/schema.xml"
     owner: solr
     group: solr
+    remote_src: yes
   notify: restart solr
   become: true
+
+- name: Create database tables
+  command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan db init -c {{ ckan_config_file }}"
 
 # datastore plugin changes
 - name: Enable datastore plugin
