@@ -120,12 +120,14 @@
   command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan db init -c {{ ckan_config_file }}"
 
 
-- name: Create symlink to schema
-  file:
+- name: Copy solr schema
+  copy:
     src: "{{ ckan_solr_schema_source }}"
     dest: "{{ ckan_solr_conf_path }}/schema.xml"
-    state: link
+    owner: solr
+    group: solr
   notify: restart solr
+  become: true
 
 # datastore plugin changes
 - name: Enable datastore plugin
