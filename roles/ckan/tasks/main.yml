@@ -48,7 +48,7 @@
   changed_when: "'already installed' not in ckan_installed.stderr"
   notify:
     - Restart Apache
-    - Restart Nginx
+    # - Restart Nginx
 
 - name: install ckan dependencies
   pip:
