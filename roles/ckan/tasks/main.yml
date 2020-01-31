@@ -78,7 +78,8 @@
 - name: Compile ckan config
   command: "{{ ckan_python_env_path }}/bin/paster make-config ckan {{ ckan_config_file }}"
 
-- include_role:
+- name: install solr
+  include_role:
     name: solr 
     tasks_from: main 
     vars_from: main 
