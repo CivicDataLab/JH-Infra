@@ -9,3 +9,4 @@ inventory:
   - name: ckan
     image: yotis/ubuntu1804-pfne
     expose: [ '5000', '8983']
+    ports: ['5000:5000', '8983:8983']

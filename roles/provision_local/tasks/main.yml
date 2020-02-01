@@ -13,6 +13,7 @@
     expose: "{{ item.expose|default(['1-65535']) }}"
     ports: "{{ item.ports|default(omit) }}"
     volumes: "{{ provision_docker_volumes|default(omit) }}"
+    network_mode: bridge
   with_items: "{{ inventory }}"
 
 - name: Get IP of container
