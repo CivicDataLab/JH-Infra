@@ -4,6 +4,7 @@ ckan_pip_dependencies:
   - { name: 'setuptools', version: '36.1.0'}
   - { name: 'wheel', version: '0.31.1'}
   - { name: 'urllib3[secure]', version: '1.19.1' }
+  - { name: 'flask-debugtoolbar', version: '0.11.0' }
 
 ckan_config_file: "/etc/ckan/default/development.ini"
 ckan_domain: localhost
