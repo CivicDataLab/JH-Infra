@@ -10,3 +10,4 @@ inventory:
     image: yotis/ubuntu1804-pfne
     expose: [ '5000', '8983']
     ports: ['5000:5000', '8983:8983']
+provision_docker_volumes: '../:/usr/share/code'
