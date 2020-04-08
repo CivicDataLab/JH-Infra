@@ -168,6 +168,62 @@
 - name: Make admin as sys admin
   command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan sysadmin add {{ ckan_admin_username }} email={{ ckan_admin_email }} name={{ ckan_admin }} -c {{ ckan_config_file }}"
   when: 'ckan_admin_username not in ckan_admin_user.stdout'
+
+
+
+# changes missed out in the playbook
+- name: Update datastore max resource size in the config
+  lineinfile:
+    path: "{{ ckan_config_file }}"
+    regexp: "ckan.max_resource_size"
+    line: ckan.max_resource_size = 20
+
+
+
+- name: Create the directory for uploads
+  command: "sudo mkdir -p /var/lib/ckan/justice-hub-uploads"
+
+
+
+- name: Update storage path in the config
+  lineinfile:
+    path: "{{ ckan_config_file }}"
+    insertafter: "(app:main)"
+    line: ckan.storage_path = /var/lib/ckan/justice-hub-uploads
+
+
+
+- name: Set the owner of storage path
+  command: "sudo chown www-data:www-data /var/lib/ckan/justice-hub-uploads"
+
+
+
+- name: Set the permission of storage path
+  command: "sudo chmod u+rwx /var/lib/ckan/justice-hub-uploads"
+
+
+
+- name: Comment the element add-schema-fields in the solrconfig.xml
+  lineinfile:
+    path: "{{ ckan_solr_conf_path }}/solrconfig.xml"
+    regexp: "(uuid,remove-blank)"
+    line: processor="uuid,remove-blank,field-name-mutating,parse-boolean,parse-long,parse-double,parse-date">
+  notify: restart solr
+
+
+#- name: Comment the element add-schema-fields in the solrconfig.xml
+#  replace:
+#    path: "{{ ckan_solr_conf_path }}/solrconfig.xml"
+#    regexp: '^processor\s*=\s*(.*),add-schema-fields(.*)$'
+#    replace: 'processor = \1 \2'
+#  notify: restart solr
+
+
+
+
+
+
+
   
 # 
 

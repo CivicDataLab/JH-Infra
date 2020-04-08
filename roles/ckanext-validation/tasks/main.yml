@@ -1,0 +1,99 @@
+- name: Install Ckanext-validation
+  command: chdir=/usr/lib/ckan/ckan-env/src git clone https://github.com/frictionlessdata/ckanext-validation.git
+  
+
+
+- name: install ckanext-validation dependencies
+  pip:
+    virtualenv: "{{ ckan_python_env_path }}"
+    requirements: "{{ ckan_python_env_path }}/src/ckanext-validation/requirements.txt"
+
+
+
+- name: run python setup.py develop
+  pip:
+    virtualenv: "{{ ckan_python_env_path }}"
+    name: .
+    state: present
+    editable: yes
+    chdir : "{{ ckan_python_env_path }}/src/ckanext-validation"
+
+
+
+#- name: run python setup.py develop
+#  command: chdir=/usr/lib/ckan/ckan-env/src/ckanext-validation python setup.py develop 
+
+
+
+- name: Enable validation plugin
+  lineinfile:
+    path: "{{ ckan_config_file }}"
+    backrefs: yes
+    regexp: "(ckan.plugins) (.*)"
+    line: '\1 \2 validation'
+
+
+- name: setting schemas to be used in config- and setting operation modes - insert multiple lines 
+  blockinfile:
+    path: "{{ ckan_config_file }}"
+    insertafter: "(ckan.plugins)"
+    marker: "# {mark} Setting schema and operation mode "
+    block: |
+        scheming.dataset_schemas = ckanext.validation.examples:ckan_default_schema.json
+
+        scheming.presets = ckanext.scheming:presets.json
+                            ckanext.validation:presets.json
+
+        scheming.dataset_fallback = false
+
+        ckanext.validation.run_on_create_async=True
+        ckanext.validation.run_on_update_async=True
+
+        ckanext.validation.run_on_create_sync=True
+        ckanext.validation.run_on_update_sync=True
+   
+
+
+
+- name: setting resource_fields in ckanext-scheming schema
+  blockinfile:
+    path: "{{ ckanext_scheming_schema_file }}"
+    insertafter: "(resource_fields)"
+    marker: ""
+    block: |
+          {
+            "field_name": "schema",
+            "label": "Schema",
+            "preset": "resource_schema"
+          },
+          {
+            "field_name": "validation_options",
+            "label": "Validation options",
+            "preset": "validation_options"
+          },
+          {
+            "field_name": "validation_status",
+            "label": "Validation status",
+            "preset": "hidden_in_form"
+          },
+          {
+            "field_name": "validation_timestamp",
+            "label": "Validation timestamp",
+            "preset": "hidden_in_form"
+          },
+
+
+
+- name: initialize db
+  command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan db init --config={{ ckan_config_file }}"
+
+
+
+- name: create basic databse setup for validation
+  command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckanext-validation validation init-db --config={{ ckan_config_file }}"
+
+
+
+
+
+
