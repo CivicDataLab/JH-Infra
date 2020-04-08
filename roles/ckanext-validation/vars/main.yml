@@ -1,0 +1,6 @@
+# Variables associated with current role
+
+
+
+ckan_config_file: "/etc/ckan/default/development.ini"
+ckanext_scheming_schema_file: "/usr/lib/ckan/ckan-env/src/ckanext-scheming/ckanext/scheming/ckan_dataset.json"

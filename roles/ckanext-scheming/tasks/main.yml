@@ -1,0 +1,44 @@
+- name: Install Ckanext-scheming
+  pip:
+    virtualenv: "{{ ckan_python_env_path }}"
+    name: git+https://github.com/ckan/ckanext-scheming.git#egg=ckanext-scheming
+    state: present
+    editable: yes
+    chdir : "{{ ckan_python_env_path }}/src"
+
+
+
+- name: install ckanext-scheming dependencies
+  pip:
+    virtualenv: "{{ ckan_python_env_path }}"
+    requirements: "{{ ckan_python_env_path }}/src/ckanext-scheming/requirements.txt"
+
+
+
+- name: Enable scheming_datasets plugin
+  lineinfile:
+    path: "{{ ckan_config_file }}"
+    backrefs: yes
+    regexp: "(ckan.plugins) (.*)"
+    line: '\1 \2 scheming_datasets'
+
+
+
+- name: setting schemas to be used in config- insert multiple lines 
+  blockinfile:
+    path: "{{ ckan_config_file }}"
+    insertafter: "(ckan.plugins)"
+    block: |
+         scheming.dataset_schemas = ckanext.spatialx:spatialx_schema.json
+                                     ckanext.spatialx:spatialxy_schema.json
+
+         scheming.presets = ckanext.scheming:presets.json
+
+         scheming.dataset_fallback = false
+    marker: "# {mark} Setting schema and operation mode "
+
+
+
+
+
+
