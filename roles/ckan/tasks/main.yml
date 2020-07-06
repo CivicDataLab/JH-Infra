@@ -36,6 +36,7 @@
     name: "{{ item.name }}"
     version: "{{ item.version }}"
     virtualenv: "{{ ckan_python_env_path }}"
+    extra_args: --default-timeout=100
   with_items: "{{ ckan_pip_dependencies }}"
 
 - name: Install CKAN
@@ -168,7 +169,9 @@
 - name: Make admin as sys admin
   command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckan sysadmin add {{ ckan_admin_username }} email={{ ckan_admin_email }} name={{ ckan_admin }} -c {{ ckan_config_file }}"
   when: 'ckan_admin_username not in ckan_admin_user.stdout'
-  
+
+- include: ckanext-validation.yml
+
 # 
 
 # - name: Run ckan

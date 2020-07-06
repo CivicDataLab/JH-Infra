@@ -43,3 +43,9 @@ ckan_admin: admin
 ckan_admin_email: info@civicdatalab.in
 ckan_admin_username: admin
 ckan_admin_password: Abcd1234
+
+#ckanext-valudation env
+ckanext_validation_workspace: /root
+ckanext_validation_url: https://github.com/frictionlessdata/ckanext-validation/archive/v0.0.8.tar.gz
+ckanext_validation_version: "0.0.8"
+ckanext_validation_filename: "ckanext-validation-{{ ckanext_validation_version }}"

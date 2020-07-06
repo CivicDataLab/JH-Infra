@@ -1,0 +1,74 @@
+- name: Download ckanext-validation package
+  get_url:
+    url: "{{ ckanext_validation_url }}"
+    dest: "{{ ckanext_validation_workspace }}/{{ ckanext_validation_filename }}.tgz"
+    force: false
+  register: ckanext_validation_download_status
+
+- name: Expand ckanext-validation package
+  unarchive:
+    src: "{{ ckanext_validation_workspace }}/{{ ckanext_validation_filename }}.tgz"
+    dest: "{{ ckanext_validation_workspace }}"
+    copy: false
+  when: ckanext_validation_download_status.changed
+
+- name: Install pip packages for ckanext_validation
+  pip:
+    requirements: "{{ ckanext_validation_workspace }}/{{ ckanext_validation_filename }}/requirements.txt"
+    virtualenv: "{{ ckan_python_env_path }}"
+    extra_args: --default-timeout=100
+
+- name: Install ckanapi
+  pip:
+    name: ckanapi==4.3
+    virtualenv: "{{ ckan_python_env_path }}"
+
+- name: Setup ckanext_validation
+  command: "chdir={{ ckanext_validation_workspace}}/{{ ckanext_validation_filename }} {{ ckan_python_env_path }}/bin/python setup.py develop"
+
+- name: Create database tables
+  command: "{{ ckan_python_env_path }}/bin/paster --plugin=ckanext-validation validation init-db -c {{ ckan_config_file }}"
+
+- name: Enable ckanext_validation with scheming
+  lineinfile:
+    path: "{{ ckan_config_file }}"
+    backrefs: yes
+    regexp: "(ckan.plugins) (.*)"
+    line: '\1 \2 validation scheming_datasets scheming_groups scheming_organizations'
+
+# Can be done as block
+
+- name: Enable sync validation on create
+  ini_file:
+    path: "{{ ckan_config_file }}"
+    section: "app:main"
+    option: "ckanext.validation.run_on_create_sync"
+    value: "True"
+
+- name: Enable sync validation on update
+  ini_file:
+    path: "{{ ckan_config_file }}"
+    section: "app:main"
+    option: "ckanext.validation.run_on_update_sync"
+    value: "True"
+
+- name: Enable validation badges in listing
+  ini_file:
+    path: "{{ ckan_config_file }}"
+    section: "app:main"
+    option: "ckanext.validation.show_badges_in_listings"
+    value: "True"
+
+- name: Enable dataset schemas
+  ini_file:
+    path: "{{ ckan_config_file }}"
+    section: "app:main"
+    option: "scheming.dataset_schemas"
+    value: "ckanext.validation.examples:ckan_default_schema.json"
+
+- name: Enable scheming presets
+  ini_file:
+    path: "{{ ckan_config_file }}"
+    section: "app:main"
+    option: "scheming.presets"
+    value: "ckanext.scheming:presets.json ckanext.validation:presets.json"

@@ -22,6 +22,10 @@
   apt_repository:
     repo: "deb http://us.archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }} universe"
     state: present
+  register: apt_status
+  until: apt_status is success
+  delay: 6
+  retries: 10
 
 - name: Install necessities and nice-to-haves
   apt: pkg={{ item }} state=present
