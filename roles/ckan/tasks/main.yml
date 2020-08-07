@@ -1,34 +1,42 @@
+- name:
+  set_fact: myuser="{{ ansible_user }}"
+
 - name: create required directories
+  become: true
   file:
     path: "{{ item }}"
     state: directory
-    mode: 0644
+    mode: 755
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
   loop:
-    - "~/ckan/lib"
-    - "~/ckan/etc"
+    - "/home/{{ myuser }}/ckan"
+    - "/home/{{ myuser }}/ckan/lib"
+    - "/home/{{ myuser }}/ckan/etc"
 
 - name: create symlinks
+  become: true
   file:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     state: link
+    mode: 755
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
   loop:
-    - { src: "~/ckan/lib", dest: "/usr/lib/ckan" }
-    - { src: "~/ckan/etc", dest: "/etc/ckan" }
+    - { src: "/home/{{ myuser }}/ckan/lib", dest: "/usr/lib/ckan" }
+    - { src: "/home/{{ myuser }}/ckan/etc", dest: "/etc/ckan" }
 
 - name: create ckan env directory
   file:
     path: "{{ ckan_python_env_path }}"
     state: directory
-
-- name: chown to current user
-  file:
-    path: "{{ ckan_python_env_path }}"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0755
 
 - name: Create virtual env for ckan
+  become: true
   command: virtualenv --no-site-packages '{{ ckan_python_env_path }}' -p python2.7 creates="{{ ckan_python_env_path }}"
 
 - name: Install pip packages not covered by dependencies
@@ -85,6 +93,7 @@
     vars_from: main 
 
 - include: postgres.yml
+  become: true
 
 - name: Update sqlalchemy url in the config
   lineinfile:
