@@ -1,10 +1,12 @@
 # Handler for common commands
 - name: Restart Apache
+  become: true
   service: 
     name: apache2 
     state: restarted
 
 - name: Restart Nginx
+  become: true
   service: 
     name: nginx
     state: restarted
@@ -20,6 +22,7 @@
     state: restarted
 
 - name: restart postgresql
+  become: true
   service:
     name: "{{ postgresql_daemon }}"
     state: "restarted"

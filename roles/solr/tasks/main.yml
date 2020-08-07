@@ -31,6 +31,7 @@
     enabled: true
 
 - name: disable ipv6 in redis # check https://github.com/antirez/redis/issues/5055#issuecomment-405516849
+  become: true
   lineinfile:
     path: "/etc/redis/redis.conf"
     regexp: "bind .*"
@@ -44,9 +45,11 @@
 
 
 - include: configure.yml
+  become: true
 - include: cores.yml
 
 - name: Apply CKAN schema factory configuration changes.
+  become: true
   blockinfile:
     dest: "{{ ckan_solr_config_file }}"
     insertafter: "<config>"
@@ -55,6 +58,7 @@
   notify: restart solr
 
 - name: Remove update processer section
+  become: true
   xml:
     path: "{{ ckan_solr_config_file }}"
     xpath: /config/updateRequestProcessorChain/processor[@class='solr.AddSchemaFieldsUpdateProcessorFactory']
@@ -64,6 +68,7 @@
   notify: restart solr
 
 - name: Remove init params processer section
+  become: true
   xml:
     path: "{{ ckan_solr_config_file }}"
     xpath: /config/initparams[@path='/update/**']
@@ -73,6 +78,7 @@
   notify: restart solr
 
 - name: Remove default search field config
+  become: true
   lineinfile:
     path: "{{ ckan_solr_schema_source }}"
     regexp: "defaultSearchField"
@@ -80,6 +86,7 @@
   notify: restart solr
 
 - name: Remove solrQueryParser config
+  become: true
   lineinfile:
     path: "{{ ckan_solr_schema_source }}"
     regexp: "solrQueryParser"
@@ -87,6 +94,7 @@
   notify: restart solr
 
 - name: replace old datatypes with new ones
+  become: true
   replace:
     path: "{{ ckan_solr_schema_source }}"
     regexp: "{{ item.old }}"
@@ -102,6 +110,7 @@
 
 
 - name: Delete managed-schema file
+  become: true
   file:
     path: "{{ ckan_solr_conf_path }}/managed-schema"
     state: absent
