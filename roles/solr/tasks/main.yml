@@ -14,6 +14,7 @@
     force: false
   when: solr_install_path_status.stat.isdir is not defined
   register: solr_download_status
+  become: true
 
 - name: Expand Solr.
   unarchive:
@@ -21,27 +22,31 @@
     dest: "{{ solr_workspace }}"
     copy: false
   when: solr_download_status.changed
+  become: true
 
 - include: install.yml
+  become: true
 
 - name: Ensure solr is started and enabled on boot
   service:
     name: "{{ solr_service_name }}"
     state: "started"
     enabled: true
+  become: true
 
 - name: disable ipv6 in redis # check https://github.com/antirez/redis/issues/5055#issuecomment-405516849
-  become: true
   lineinfile:
     path: "/etc/redis/redis.conf"
     regexp: "bind .*"
     line: bind 127.0.0.1
+  become: true
 
 - name: Ensure redis is started and enabled on boot
   service:
     name: "redis-server"
     state: "started"
     enabled: true
+  become: true
 
 
 - include: configure.yml
@@ -117,4 +122,4 @@
   notify: restart solr
 
 - include: cleanup.yml
-
+  become: true

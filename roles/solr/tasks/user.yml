@@ -2,9 +2,11 @@
   group:
     name: "{{ solr_user }}"
     state: present
+  become: true
 
 - name: Ensure solr_user exists.
   user:
     name: "{{ solr_user }}"
     group: "{{ solr_user }}"
     state: present
+  become: true

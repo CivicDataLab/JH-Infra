@@ -3,16 +3,19 @@
 - name: Update apt cache
   apt:
     update_cache: yes
+  become: true
 
 - name: Upgrade all safe packages
   apt:
     upgrade: safe
+  become: true
 
 - name: Install unattended upgrades (Debian/Ubuntu only)
   apt:
     pkg: unattended-upgrades
     state: present
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  become: true
 
 # - name: 'Make sure unattended-upgrades only installs from $ubuntu_release-security'
 #   lineinfile: 'dest=/etc/apt/apt.conf.d/50unattended-upgrades regexp="$ubuntu_release-updates" state=absent'
@@ -22,6 +25,7 @@
   apt_repository:
     repo: "deb http://us.archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }} universe"
     state: present
+  become: true
 
 - name: Install necessities and nice-to-haves
   apt: pkg={{ item }} state=present
@@ -66,6 +70,8 @@
     - openjdk-8-jdk
 
   when: ansible_pkg_mgr == 'apt'
+  become: true
 
 - name: Enable passwordless sudo
   lineinfile: 'dest=/etc/sudoers regexp="sudo ALL=NOPASSWD: ALL" line="%sudo ALL=NOPASSWD: ALL" state=present'
+  become: true

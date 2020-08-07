@@ -1,4 +1,4 @@
-- name:
+- name: register local user
   set_fact: myuser="{{ ansible_user }}"
 
 - name: create required directories
@@ -14,6 +14,11 @@
     - "/home/{{ myuser }}/ckan/lib"
     - "/home/{{ myuser }}/ckan/etc"
 
+- name: check user
+  debug:
+      var: myuser # not required. A variable name to debug.  Mutually exclusive with the 'msg' option.
+      verbosity: 0 # not required. A number that controls when the debug is run, if you set to 3 it will only run debug when -vvv or above
+
 - name: create symlinks
   become: true
   file:
@@ -21,8 +26,8 @@
     dest: "{{ item.dest }}"
     state: link
     mode: 755
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "{{ myuser }}"
+    group: "{{ myuser }}"
   loop:
     - { src: "/home/{{ myuser }}/ckan/lib", dest: "/usr/lib/ckan" }
     - { src: "/home/{{ myuser }}/ckan/etc", dest: "/etc/ckan" }
@@ -36,8 +41,8 @@
     mode: 0755
 
 - name: Create virtual env for ckan
-  become: true
   command: virtualenv --no-site-packages '{{ ckan_python_env_path }}' -p python2.7 creates="{{ ckan_python_env_path }}"
+  
 
 - name: Install pip packages not covered by dependencies
   pip:
@@ -52,8 +57,6 @@
     name: git+https://github.com/ckan/ckan.git@ckan-2.8.2#egg=ckan
     state: present
     editable: yes
-  register: ckan_installed
-  changed_when: "'already installed' not in ckan_installed.stderr"
   notify:
     - Restart Apache
     # - Restart Nginx
