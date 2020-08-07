@@ -1,0 +1,31 @@
+# Role to deploy to a remote ec2 cs_instance
+
+- hosts: all
+  tasks:
+    - name: Get instance facts
+      ec2_instance_info:
+        aws_access_key: "{{ec2_access_key}}"
+        aws_secret_key: "{{ec2_secret_key}}"
+        instance_ids:
+          - "{{ ec2_instance_id }}"
+      register: result
+    - name: Instances ID
+      debug:
+        msg: "ID: {{ item.instance_id }} - State: {{ item.state.name }} - Public IP: {{ item.public_ip_address }}"
+      loop: "{{ result.instances }}"
+    - name: Register host
+      add_host: hostname={{ item.public_ip_address }} groupname=ec2hosts
+      with_items: "{{ result.instances }}"
+
+- hosts: ec2hosts
+  gather_facts: true
+  user: ubuntu
+  become: true
+  roles:
+  - common
+
+- hosts: ec2hosts
+  gather_facts: true
+  user: ubuntu
+  roles:
+  - ckan
