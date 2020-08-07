@@ -50,6 +50,7 @@
     - python3-pip
     - python-psycopg2
     - python-pycurl
+    - python-lxml
     - software-properties-common
     - python-dev
     - python-virtualenv
@@ -60,6 +61,7 @@
     - redis-server
     - screen
     - sudo
+    - vim
     - wget
     - openjdk-8-jdk
 
